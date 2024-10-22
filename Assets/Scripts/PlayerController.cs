@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     private float verticalMove;
     public CharacterController player;
 
-    public float playerSpeed = 10;
+    public float playerSpeed = 15;
     private Vector3 movePlayer;
 
     public Camera mainCamera;
