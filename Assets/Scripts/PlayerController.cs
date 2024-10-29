@@ -26,9 +26,13 @@ public class PlayerController : MonoBehaviour
     public float slideVelocity;
     public float slopeForceDown;
 
+
+    public Animator playerAnimatorController;
+
     void Start()
     {
         player = GetComponent<CharacterController>();
+        playerAnimatorController = GetComponent<Animator>();
     }
 
     void Update()
@@ -38,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
         playerInput = new Vector3(horizontalMove, 0, verticalMove);
         playerInput = Vector3.ClampMagnitude(playerInput, 1);
+
+        playerAnimatorController.SetFloat("PlayerWalkVelocity", playerInput.magnitude * playerSpeed);
 
         camDirection();
 
@@ -78,6 +84,7 @@ public class PlayerController : MonoBehaviour
         {
             fallVelocity = jumpForce;
             movePlayer.y = fallVelocity;
+            playerAnimatorController.SetTrigger("PlayerJump");
         }
     }
 
@@ -93,7 +100,9 @@ public class PlayerController : MonoBehaviour
         {
             fallVelocity -= gravity * Time.deltaTime;
             movePlayer.y = fallVelocity;
+            playerAnimatorController.SetFloat("PlayerVerticalVelocity", player.velocity.y);
         }
+        playerAnimatorController.SetBool("IsGrounded", player.isGrounded);
         SlideDown();
     }
 
@@ -115,6 +124,10 @@ public class PlayerController : MonoBehaviour
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         hitNormal = hit.normal;
+    }
+
+    private void OnAnimatorMove() {
+        
     }
 
 }
