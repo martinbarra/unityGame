@@ -6,18 +6,25 @@ public class PlayerController : MonoBehaviour
 {
     public float horizontalMove;
     public float verticalMove;
+
     private Vector3 playerInput;
 
     public CharacterController player;
-
     public float playerSpeed;
-    private Vector3 movePlayer;
     public float gravity = 9.8f;
     public float fallVelocity;
     public float jumpForce;
+
+
     public Camera mainCamera;
     private Vector3 camForward;
     private Vector3 camRight;
+    private Vector3 movePlayer;
+
+    public bool isOnSlope = false;
+    private Vector3 hitNormal;
+    public float slideVelocity;
+    public float slopeForceDown;
 
     void Start()
     {
@@ -53,14 +60,14 @@ public class PlayerController : MonoBehaviour
 
     void camDirection()
     {
-        camForward = mainCamera.transform.forward; 
+        camForward = mainCamera.transform.forward;
         camRight = mainCamera.transform.right;
 
         camForward.y = 0;
         camRight.y = 0;
 
         camForward = camForward.normalized;
-        camRight = camRight.normalized;  
+        camRight = camRight.normalized;
     }
 
     //Funcion para las habilidades del jugador 
@@ -77,14 +84,37 @@ public class PlayerController : MonoBehaviour
     void SetGravity()
     {
 
-        if(player.isGrounded){
-           fallVelocity = -gravity * Time.deltaTime; 
-           movePlayer.y = fallVelocity;
+        if (player.isGrounded)
+        {
+            fallVelocity = -gravity * Time.deltaTime;
+            movePlayer.y = fallVelocity;
         }
-        else{
-            fallVelocity -= gravity * Time.deltaTime; 
-             movePlayer.y = fallVelocity;
+        else
+        {
+            fallVelocity -= gravity * Time.deltaTime;
+            movePlayer.y = fallVelocity;
         }
+        SlideDown();
+    }
+
+    public void SlideDown()
+    {
+
+        isOnSlope = Vector3.Angle(Vector3.up, hitNormal) >= player.slopeLimit;
+        if (isOnSlope)
+        {
+            movePlayer.x += ((1f-hitNormal.y) * hitNormal.x) * slideVelocity;
+            movePlayer.z += ((1f-hitNormal.y) * hitNormal.z)* slideVelocity;
+
+            movePlayer.y += slopeForceDown;
+        }
+ 
+    }
+
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        hitNormal = hit.normal;
     }
 
 }
